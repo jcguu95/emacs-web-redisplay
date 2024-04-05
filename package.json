@@ -1,0 +1,20 @@
+{
+  "name": "emacs-web-redisplay",
+  "version": "0.0.0",
+  "description": "\"Redisplaying Emacs in the Web\"",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "emacs",
+    "electron",
+    "redisplay"
+  ],
+  "author": "Jin-Cheng Guu",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^29.2.0"
+  }
+}
