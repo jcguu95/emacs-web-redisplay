@@ -1,0 +1,32 @@
+.frame {
+  margin: 20px;
+  width: 500px;
+  height: 700px;
+  border: 1px solid #ccc;
+  overflow: auto;
+  position: relative;
+}
+
+.window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.window:first-child {
+  top: 0;
+  height: 40%;
+}
+.window:nth-child(2) {
+  top: 50%;
+  height: 40%;
+}
+
+.window.active {
+    border: 2px solid blue;
+    font-weight: bold;
+}
