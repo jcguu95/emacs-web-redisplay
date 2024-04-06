@@ -42,17 +42,8 @@ const createWindow = () => {
 
 async function reactToButtonClick () {
     console.log("Button clicked.")
-    return emacsEval(`
-(let* ((window (car (window-list)))
-       (from (window-start window))
-       (to   (window-end   window))
-       (buffer (window-buffer window)))
-  (with-current-buffer buffer
-    (let ((string (substring (buffer-string) (1- from))))
-      (setf string (substring string 0 (min (- to from) (length string))))
-      string)))
-`)
-}
+    const output = emacsEval(`(serialize (listify (peekable-string)))`)
+    return output}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

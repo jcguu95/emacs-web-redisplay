@@ -10,9 +10,10 @@ windows.forEach((div, index) => {
 });
 
 btn.addEventListener('click', async () => {
-    const result = await window.electronAPI.click()
-    console.log('main->', result)
+    const result = JSON.parse(JSON.parse(await window.electronAPI.click()))
+    console.log(result)
 })
+
 
 // Add event listener for keyup event
 document.addEventListener('keyup', function(event) {
