@@ -42,7 +42,16 @@ const createWindow = () => {
 
 async function reactToButtonClick () {
     console.log("Button clicked.")
-    return emacsEval('(window-buffer (car (window-list)))')
+    return emacsEval(`
+(let* ((window (car (window-list)))
+       (from (window-start window))
+       (to   (window-end   window))
+       (buffer (window-buffer window)))
+  (with-current-buffer buffer
+    (let ((string (substring (buffer-string) (1- from))))
+      (setf string (substring string 0 (min (- to from) (length string))))
+      string)))
+`)
 }
 
 // This method will be called when Electron has finished

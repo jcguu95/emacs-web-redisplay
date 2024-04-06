@@ -1,7 +1,7 @@
 .frame {
   margin: 20px;
   width: 500px;
-  height: 700px;
+  height: 300px;
   border: 1px solid #ccc;
   overflow: auto;
   position: relative;
@@ -18,15 +18,34 @@
 }
 
 .window:first-child {
-  top: 0;
-  height: 40%;
+  left: 0;
+  width: 45%;
 }
 .window:nth-child(2) {
-  top: 50%;
-  height: 40%;
+  left: 50%;
+  width: 45%;
 }
 
 .window.active {
-    border: 2px solid blue;
+    border: 1px solid blue;
     font-weight: bold;
+}
+
+.emacs-frame {
+  margin: 20px;
+  width: 500px;
+  height: 300px;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  position: relative;
+}
+
+.emacs-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* overflow: auto; */
+  padding: 10px;
 }
