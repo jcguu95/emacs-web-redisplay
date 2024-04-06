@@ -2,6 +2,28 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('node:path')
 
+// Talk to emacs
+const { exec } = require('child_process');
+function runCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        reject(error);
+      } else {
+        // console.log(`stdout: ${stdout}`);
+        // console.error(`stderr: ${stderr}`);
+        resolve(stdout);
+      }
+    });
+  });
+}
+function emacsEval(lispForm) {
+    result = runCommand(`emacsclient -e "${lispForm}"`)
+    console.log(result)
+    return result
+}
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -12,16 +34,15 @@ const createWindow = () => {
     }
   })
 
-  // and load the index.html of the app.
+  // Load the index.html of the app.
   mainWindow.loadFile('index.html')
-
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 }
 
 async function reactToButtonClick () {
-    console.log("Button clicked!")
-    return "Stop clicking it!"
+    console.log("Button clicked.")
+    return emacsEval('(window-buffer (car (window-list)))')
 }
 
 // This method will be called when Electron has finished
