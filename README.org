@@ -1,0 +1,21 @@
+# Usage
+
+`npm start`
+
+# TODO
+
++ [ ] Remove Electron IPC and use [WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API).
++ [ ] Write a function for each of the following steps.
+
+      ``` markdown
+        1. [ ] Emacs State -> Peekable (Propertied) Buffer String and Overlays
+        2. [ ]             -> Json String
+        3. [ ]             -> Json String [via WebSocket]
+        4. [ ]             -> String, Properties, Overlays (and print out onto the end of the webpage)
+        5. [ ]             -> Presentable Characters
+        6. [ ]             -> Document Operations
+        7. [ ]             -> Effects
+      ```
+
++ [ ] Page Starts: Start Listening to Emacs WebSocket Server.
+      If connection is on
