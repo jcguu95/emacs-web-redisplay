@@ -30,7 +30,8 @@ current window."
     (reverse result)))
 
 (defun listify (string)
-  "Turn the string (may be a property string) into a list of substrings and properties."
+  "Turn the string (may be a property string) into a list of
+ substrings and properties."
   (let* ((plain-string (substring-no-properties string))
          (object-intervals (object-intervals string))
          (result nil))
@@ -38,11 +39,42 @@ current window."
      (lambda (interval)
        ;; The cons cell has (string . properties).
        (cons (substring plain-string (nth 0 interval) (nth 1 interval))
-             (take-pairs (nth 2 interval) text-property-keys)))
+             (take-pairs (nth 2 interval) text-property-keys))) ; TODO Maybe factor this out.
      object-intervals)))
 
 ;; (cl-subseq (listify (peekable-string)) 0 20)
 
 (defun serialize (str-lists)
-  (json-encode-list (mapcar (lambda (x) (push 'text x) (ht<-plist x)) str-lists)))
+  (json-encode-list (mapcar (lambda (x)
+                              (push 'text x)
+                              (ht<-plist x))
+                            str-lists)))
 
+;; ;; This provides the peekable string in json.
+;; (serialize (listify (peekable-string)))
+
+(defun peekable-overlays-and-properties ()
+  (let* ((window (car (window-list)))
+         (buffer (window-buffer window)))
+    (with-current-buffer buffer
+      (mapcar (lambda (overlay)
+                (list (overlay-start overlay)
+                      (overlay-end overlay)
+                      (overlay-properties overlay)))
+              (car (overlay-lists))))))
+
+;;; Note
+
+;; Invisible Text https://www.gnu.org/software/emacs/manual/html_node/elisp/Invisible-Text.html
+;; e.g. buffer-invisibility-spec
+;;
+;; See the source code of #'org-fold-core-region  -- org-fold may be using this to fold stuff.
+;; Notice also that there are at least two possible values of org-fold-core-style: 'overlays and 'text-properties.
+
+
+;; Temporary Display
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Temporary-Displays.html
+
+
+;; Truncation
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Truncation.html
