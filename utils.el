@@ -1,6 +1,6 @@
 ;; This file is meant to be evaluated by emacsclient.
 
-(defun peekable-string ()
+(defun peekable-string-and-properties ()
   "Return the segment of the buffer string that is peekable in the
 current window."
   (let* ((window (car (window-list)))
@@ -10,58 +10,44 @@ current window."
     (with-current-buffer buffer
       (let ((string (substring (buffer-string) (1- from))))
         (setf string (substring string 0 (min (- to from) (length string))))
-        string))))
+        (let* ((plain-string (substring-no-properties string))
+               (properties (object-intervals string)))
+          (cons plain-string
+                (mapcar (lambda (p)
+                          (setf (nth 2 p) (ht<-plist (nth 2 p)))
+                          p)
+                        properties)))))))
 
-;; Text properties keys of interest to be piped to electron.
-(defvar text-property-keys
-  '(face
-    ;; fontified
-    ;; display                             ; Support this for showing images in electron.
-    ))
-
-(defun take-pairs (plist keys)
-  "Return a sub-plist consisting of key is a member of keys."
-  ;; FIXME This takes O(nn), while it can be done in O(n).
-  (let ((result nil))
-    (dotimes (n (/ (length plist) 2))
-      (when (member (nth (* n 2) plist) keys)
-        (push (nth (* n 2) plist) result)
-        (push (nth (1+ (* n 2)) plist) result)))
-    (reverse result)))
-
-(defun listify (string)
-  "Turn the string (may be a property string) into a list of
- substrings and properties."
-  (let* ((plain-string (substring-no-properties string))
-         (object-intervals (object-intervals string))
-         (result nil))
-    (mapcar
-     (lambda (interval)
-       ;; The cons cell has (string . properties).
-       (cons (substring plain-string (nth 0 interval) (nth 1 interval))
-             (take-pairs (nth 2 interval) text-property-keys))) ; TODO Maybe factor this out.
-     object-intervals)))
-
-;; (cl-subseq (listify (peekable-string)) 0 20)
-
-(defun serialize (str-lists)
-  (json-encode-list (mapcar (lambda (x)
-                              (push 'text x)
-                              (ht<-plist x))
-                            str-lists)))
-
-;; ;; This provides the peekable string in json.
-;; (serialize (listify (peekable-string)))
-
-(defun peekable-overlays-and-properties ()
+(defun peekable-overlay-properties ()
   (let* ((window (car (window-list)))
          (buffer (window-buffer window)))
     (with-current-buffer buffer
       (mapcar (lambda (overlay)
                 (list (overlay-start overlay)
                       (overlay-end overlay)
-                      (overlay-properties overlay)))
+                      (ht<-plist (overlay-properties overlay))))
               (car (overlay-lists))))))
+
+
+(defun testing. ()
+  (let* ((sp (peekable-string-and-properties))
+         (text (car sp))
+         (text-properties (cdr sp))
+         (overlay-properties (peekable-overlay-properties)))
+    ;; NOTE I don't think json-*.el is smart enough. So I to break object
+    ;; down, jsonize, glue it back.
+    (format "{%s, %s, %s}"
+            (format "\"text\": %s" (json-encode text))
+            (format "\"text-properties\": [%s]"
+                    (mapconcat (lambda (x) (format "%s," x))
+                               ;; FIXME Trailing comma has to be taken away.
+                               (mapcar #'json-encode-list text-properties)))
+            (format "\"overlay-properties\": [%s]"
+                    ;; FIXME Trailing comma has to be taken away.
+                    (mapconcat (lambda (x) (format "%s," x))
+                               (mapcar #'json-encode-list overlay-properties))))))
+;; TODO TEST
+(json-parse-string (nth 0 (testing.)))
 
 ;;; Note
 
