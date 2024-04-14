@@ -29,7 +29,9 @@ current window."
               (car (overlay-lists))))))
 
 
-(defun testing. ()
+(defun json<-all-peekable ()
+  "Serialize the peekable text, its text properties, and the overlay
+properties of the current buffer to JSON."
   (let* ((sp (peekable-string-and-properties))
          (text (car sp))
          (text-properties (cdr sp))
@@ -39,15 +41,25 @@ current window."
     (format "{%s, %s, %s}"
             (format "\"text\": %s" (json-encode text))
             (format "\"text-properties\": [%s]"
-                    (mapconcat (lambda (x) (format "%s," x))
-                               ;; FIXME Trailing comma has to be taken away.
-                               (mapcar #'json-encode-list text-properties)))
+                    (let ((result "")
+                          (xs (mapcar #'json-encode-list text-properties)))
+                      (cl-loop for x in xs
+                               for n from 1
+                               do (setf result (concat result x))
+                               do (unless (= n (length xs))
+                                    (setf result (concat result ","))))
+                      result))
             (format "\"overlay-properties\": [%s]"
-                    ;; FIXME Trailing comma has to be taken away.
-                    (mapconcat (lambda (x) (format "%s," x))
-                               (mapcar #'json-encode-list overlay-properties))))))
-;; TODO TEST
-(json-parse-string (nth 0 (testing.)))
+                    (let ((result "")
+                          (xs (mapcar #'json-encode-list overlay-properties)))
+                      (cl-loop for x in xs
+                               for n from 1
+                               do (setf result (concat result x))
+                               do (unless (= n (length xs))
+                                    (setf result (concat result ","))))
+                      result)))))
+
+(json-parse-string (testing.))
 
 ;;; Note
 
