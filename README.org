@@ -8,7 +8,7 @@ npm start
 
 ** DONE Remove Electron IPC and use [[https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API][WebSockets API]].
 
-** Compute what to show in Emacs
+** NEXT Compute what to show in Emacs
 
 Heavy computations should be done in emacs.
 

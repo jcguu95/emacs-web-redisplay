@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (require 'websocket)
 
 (defvar *debug-queue* nil)
