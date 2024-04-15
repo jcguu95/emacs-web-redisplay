@@ -9,8 +9,18 @@ windows.forEach((div, index) => {
     });
 });
 
+// IPC with emacs via WebSocket
+// FIXME When connection fails, warn about the situation, and try to reconnect.
+emacs_ws = new WebSocket("ws://localhost:3000");
+emacs_ws.onmessage = function(event) {
+  console.log(event);
+}
+// emacs_ws.send("Hello from js!");
+// emacs_ws.close();
+
 btn.addEventListener('click', async () => {
     console.log("OUCH!")
+    emacs_ws.send("Hello from js!");
 })
 
 // Add event listener for keyup event

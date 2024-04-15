@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+
+    <!-- TODO Find out what the below are about, and all potential risks. -->
+    <!-- NOTE If without this, the webpage bans itself from connecting websockets? -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' ws://localhost:3000">
+    <!-- TODO Find out what the above are about, and all potential risks. -->
+
     <title>Hello World!</title>
     <link rel="stylesheet" href="styles.css">
   </head>

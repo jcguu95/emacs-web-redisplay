@@ -6,18 +6,24 @@ npm start
 
 * TODOs
 
-** Remove Electron IPC and use [[https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API][WebSockets API]].
+** DONE Remove Electron IPC and use [[https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API][WebSockets API]].
+
+** Compute what to show in Emacs
+
+Heavy computations should be done in emacs.
+
+In particular, what it should send to the web page is a sequence of
+characters. Each character may have its own property.
 
 ** Write a function for each of the following steps.
 
 #+begin_quote
 1. [X] Emacs State -> Peekable (Propertied) Buffer String and Overlays
 2. [X]             -> Json String
-3. [ ]             -> Json String [via WebSocket]
-4. [ ]             -> String, Properties, Overlays (and print out onto the end of the webpage)
-5. [ ]             -> Presentable Characters
-6. [ ]             -> Document Operations
-7. [ ]             -> Effects
+3. [X]             -> Json String [via WebSocket]
+4. [ ]             -> Presentable Characters
+5. [ ]             -> Document Operations
+6. [ ]             -> Effects
 #+end_quote
 
 ** Page Starts: Start Listening to Emacs WebSocket Server.
@@ -26,14 +32,8 @@ Show the live state of connection in the webpage.
 
 ** Refresh State Upon Button Clicks
 
-** Keypress Effects
+** Key-up Effects
 
 1. Print it on a div in the webpage with timestamp.
 2. Print it in emacs \*Message\* buffer with timestamp.
 
-** Compute what to show in Emacs
-
-Heavy computations should be done in emacs.
-
-In particular, what it should send to the web page is a sequence of
-characters. Each character may have its own property.

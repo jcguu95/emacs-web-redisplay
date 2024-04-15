@@ -1,7 +1,5 @@
 ;; This file is meant to be evaluated by emacsclient.
 
-(require 'websocket)
-
 (defun peekable-string-and-properties ()
   "Return the segment of the buffer string that is peekable in the
 current window."
@@ -31,7 +29,7 @@ current window."
               (car (overlay-lists))))))
 
 
-(defun json<-all-peekable ()
+(defun json-string<-all-peekable ()
   "Serialize the peekable text, its text properties, and the overlay
 properties of the current buffer to JSON."
   (let* ((sp (peekable-string-and-properties))
@@ -61,7 +59,8 @@ properties of the current buffer to JSON."
                                     (setf result (concat result ","))))
                       result)))))
 
-(json-parse-string (json<-all-peekable))
+;; TODO Test - This should not return any error.
+(json-parse-string (json-string<-all-peekable))
 
 ;;; Note
 
