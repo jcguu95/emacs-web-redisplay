@@ -28,7 +28,6 @@ current window."
                       (ht<-plist (overlay-properties overlay))))
               (car (overlay-lists))))))
 
-
 (defun json-string<-all-peekable ()
   "Serialize the peekable text, its text properties, and the overlay
 properties of the current buffer to JSON."
@@ -77,3 +76,79 @@ properties of the current buffer to JSON."
 
 ;; Truncation
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Truncation.html
+
+;;; Interval Properties Update
+
+(cl-defun %push-interval-properties
+    (int-prop int-props &optional (add-method (lambda (new-prop old-prop)
+                                                 (append new-prop old-prop))))
+  "
+An interval property is assumed to be a list of length three: (n
+m x), where n < m are integers, and x is a lisp datum. INT-PROP
+is of type interval property, whereas INT-PROPS is a list of
+inverval properties (.. (n m x) (m k y) (k l z) ..).
+
+This function returns a newly created list of interval
+properties. The returned object is obtained from \"pushing\"
+INT-PROP into INT-PROPS. For example,
+
+  (%push-interval-properties '(2 7 plist-new)
+                             '((1 4 plist-0) (4 6 plist-1) (6 9 plist-2))) =>
+    ((1 2 plist-0)
+     (2 4 (append plist-new plist-0))
+     (4 6 (append plist-new plist-1))
+     (6 7 (append plist-new plist-2))
+     (7 9 plist-2))
+"
+  (let ((start (nth 0 int-prop))
+        (end (nth 1 int-prop))
+        (new-prop (nth 2 int-prop))
+        (result nil))
+    (cl-loop
+     for int-prop- in int-props
+     do (let ((start- (nth 0 int-prop-))
+              (end- (nth 1 int-prop-))
+              (prop- (nth 2 int-prop-)))
+          (cond
+           ;; ()[   ]
+           ((<= end start-)
+            (push prop- result))
+           ;; [   ]()
+           ((>= start end-)
+            (push prop- result))
+           ;; [ () ]
+           ((and (>= start start-)
+                 (<= end end-))
+            (push (list start- start prop-) result)
+            (push (list start end (funcall add-method new-prop prop-)) result)
+            (push (list end end- prop-) result))
+           ;; ([   ])
+           ((and (<= start start-)
+                 (>= end end-))
+            (push (list start- end- (funcall add-method new-prop prop-)) result))
+           ;; ([ ) ]
+           ((and (<= start start-)
+                 (> end start-)
+                 (<= end end-))
+            (push (list start- end (funcall add-method new-prop prop-)) result)
+            (push (list end end- prop-) result))
+           ;; [ ( ])
+           ((and (>= start start-)
+                 (> end end-))
+            (push (list start- start prop-) result)
+            (push (list start end- (funcall add-method new-prop prop-)) result)))))
+    (reverse result)))
+
+;; test
+(cl-assert
+ (equal
+  (%push-interval-properties
+   '(2 7 (:new 999))
+   '((1 4 (:old 0)) (4 6 (:old 1)) (6 9 (:old 2)))
+   (lambda (new-prop old-prop)
+     (append new-prop old-prop)))
+  '((1 2 (:old 0))
+    (2 4 (:new 999 :old 0))
+    (4 6 (:new 999 :old 1))
+    (6 7 (:new 999 :old 2))
+    (7 9 (:old 2)))))
