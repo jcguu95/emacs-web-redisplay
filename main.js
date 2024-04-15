@@ -40,16 +40,10 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools()
 }
 
-async function reactToButtonClick () {
-    console.log("Button clicked.")
-    const output = emacsEval(`(serialize (listify (peekable-string)))`)
-    return output}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  ipcMain.handle('button clicked', reactToButtonClick)
   createWindow()
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the

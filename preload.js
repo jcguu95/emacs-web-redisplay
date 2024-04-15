@@ -9,10 +9,3 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${dependency}-version`, process.versions[dependency])
   }
 })
-
-// Main-Renderer IPC
-// https://www.electronjs.org/docs/latest/tutorial/ipc#1-listen-for-events-with-ipcmainhandle
-const { contextBridge, ipcRenderer } = require('electron/renderer')
-contextBridge.exposeInMainWorld('electronAPI', {
-  click: () => ipcRenderer.invoke('button clicked')
-})
