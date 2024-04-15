@@ -30,7 +30,7 @@ characters. Each character may have its own property.
 
 Show the live state of connection in the webpage.
 
-** Refresh State Upon Button Clicks
+** DONE Refresh State Upon Button Clicks
 
 ** Key-up Effects
 
