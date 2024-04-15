@@ -129,8 +129,74 @@ INT-PROP into INT-PROPS. For example,
 
 ;;;
 
-;; TODO Filter away properties irrelevant to presentation.
-(cl-defun %peekable-string-and-properties (&optional (window (car (window-list))))
+(defun plist-remove-if (pred plist)
+  "Remove all key-value pairs from PLIST if the pair satisfies PRED."
+  (let ((result nil)
+        (key nil)
+        (value nil)
+        (collect-flag nil))
+    (cl-loop for n from 0 to (1- (length plist))
+             for x in plist
+             do (if (cl-evenp n)
+                    (setf key x)
+                  (progn
+                    (setf value x)
+                    (unless (funcall pred key value)
+                      (setf collect-flag t))))
+             when collect-flag
+             collect key
+             when collect-flag
+             collect value
+             do (setf collect-flag nil))))
+
+(cl-assert
+ (equal
+  (plist-remove-if (lambda (key value)
+                     (cl-evenp (* key value)))
+                   `(1 1 2 2 3 3 4 4))
+  `(1 1 3 3)))
+
+(cl-assert
+ (equal
+  (plist-remove-if (lambda (key value)
+                     (cl-oddp (* key value)))
+                   `(1 1 2 2 3 3 4 4))
+  `(2 2 4 4)))
+
+;;;
+
+(defvar relevant-text-properties
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Properties.html
+  '(face font-lock-face
+    ;; fontified
+    ;; display
+    ;; invisible invisible-isearch
+    ;; wrap-prefix line-prefix
+    ))
+
+(defvar relevant-overlay-properties
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
+  '(priority window
+    face
+    display
+    invisible
+    isearch-open-invisible isearch-open-invisible-temporary
+    before-string after-string
+    line-prefix wrap-prefix))
+
+(defun filter-text-properties (text-properties)
+  (plist-remove-if
+   (lambda (key value)
+     (not (member key relevant-text-properties)))
+   text-properties))
+
+(defun filter-overlay-properties (text-properties)
+  (plist-remove-if
+   (lambda (key value)
+     (not (member key relevant-overlay-properties)))
+   text-properties))
+
+(cl-defun %peekable-string-and-text-properties (&optional (window (car (window-list))))
   (let* ((buffer (window-buffer window))
          (from (window-start window))
          (to (window-end window))
@@ -138,11 +204,13 @@ INT-PROP into INT-PROPS. For example,
     (setf string (substring string (1- from)))
     (setf string (substring string 0 (min (- to from) (length string))))
     (with-current-buffer buffer
-      (let* ((plain-string (substring-no-properties string))
-             (properties (object-intervals string)))
-        (cons plain-string properties)))))
+      (let* ((plain-text (substring-no-properties string))
+             (text-properties (object-intervals string)))
+        (cl-loop for text-property in text-properties
+                 do (setf (nth 2 text-property)
+                          (filter-text-properties (nth 2 text-property))))
+        (cons plain-text text-properties)))))
 
-;; TODO Filter away properties irrelevant to presentation.
 (cl-defun %peekable-overlay-properties (&optional (window (car (window-list))))
   (let* ((buffer (window-buffer window))
          (from (window-start window))
@@ -158,61 +226,29 @@ INT-PROP into INT-PROPS. For example,
       (mapcar (lambda (overlay)
                 (list (overlay-start overlay)
                       (overlay-end overlay)
-                      (overlay-properties overlay)))
+                      (filter-overlay-properties (overlay-properties overlay))))
               overlays))))
 
-(defun %get-all-properties ()
+(cl-defun window-string-with-all-properties (&optional (window (car (window-list))))
   (let* ((overlays (%peekable-overlay-properties))
-         (string (%peekable-string-and-properties))
-         (plain-string (car string))
-         (string-props (cdr string))
+         (string (%peekable-string-and-text-properties))
+         (plain-text (car string))
+         (text-props (cdr string))
          (result))
-    (cl-loop for string-prop in string-props
-             do (setf (nth 2 string-prop) (list (nth 2 string-prop))))
-    (setf result string-props)
+    (cl-loop for text-prop in text-props
+             do (setf (nth 2 text-prop) (list (nth 2 text-prop))))
+    (setf result text-props)
     (push result *debug-queue*)
     (cl-loop for overlay in overlays
              for n from 0
              do (setf result (%push-interval-properties
                               overlay result (lambda (x xs) (push x xs)))))
-    result))
+    (cons plain-text result)))
 
-(%get-all-properties)
-
-;; (defun json-string<-all-peekable ()
-;;   "Serialize the peekable text, its text properties, and the overlay
-;; properties of the current buffer to JSON."
-;;   (let* ((sp (peekable-string-and-properties))
-;;          (text (car sp))
-;;          (text-properties (cdr sp))
-;;          (overlay-properties (peekable-overlay-properties)))
-;;     ;; NOTE I don't think json-*.el is smart enough. So I to break object
-;;     ;; down, jsonize, glue it back.
-;;     (format "{%s, %s, %s}"
-;;             (format "\"text\": %s" (json-encode text))
-;;             (format "\"text-properties\": [%s]"
-;;                     (let ((result "")
-;;                           (xs (mapcar #'json-encode-list text-properties)))
-;;                       (cl-loop for x in xs
-;;                                for n from 1
-;;                                do (setf result (concat result x))
-;;                                do (unless (= n (length xs))
-;;                                     (setf result (concat result ","))))
-;;                       result))
-;;             (format "\"overlay-properties\": [%s]"
-;;                     (let ((result "")
-;;                           (xs (mapcar #'json-encode-list overlay-properties)))
-;;                       (cl-loop for x in xs
-;;                                for n from 1
-;;                                do (setf result (concat result x))
-;;                                do (unless (= n (length xs))
-;;                                     (setf result (concat result ","))))
-;;                       result)))))
-
-;; ;; TODO Test - This should not return any error.
-;; (json-parse-string (json-string<-all-peekable))
-
-
+;; TODO Test - This should not return any error.
+(json-parse-string
+ (json-encode-list
+  (window-string-with-all-properties)))
 
 ;;; Note
 
