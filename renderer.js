@@ -17,6 +17,26 @@ emacs_ws.onmessage = function(event) {
   document.getElementsByClassName("emacs-window")[0].textContent = JSON.parse(event.data)[0]
 }
 
+
+
+
+
+async function checkEmacsConnectionLoop() {
+  while (true) {
+    await new Promise(resolve => setTimeout(resolve, 1000)); // sleep for 1 second
+      if (emacs_ws.readyState === WebSocket.OPEN) {
+          document.getElementById('emacs-connection-status').textContent = 'Connected';
+      } else {
+          console.log("Disconnected!")
+          document.getElementById('emacs-connection-status').textContent = 'Disconnected';
+      }
+  }
+}
+checkEmacsConnectionLoop();
+
+
+
+
 btn.addEventListener('click', async () => {
     console.log("OUCH!")
     emacs_ws.send("JavaScript: Hello!");

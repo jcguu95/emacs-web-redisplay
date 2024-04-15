@@ -8,7 +8,7 @@ npm start
 
 ** DONE Remove Electron IPC and use [[https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API][WebSockets API]].
 
-** NEXT Compute what to show in Emacs
+** Compute what to show in Emacs
 
 Heavy computations should be done in emacs.
 
@@ -26,7 +26,7 @@ characters. Each character may have its own property.
 6. [ ]             -> Effects
 #+end_quote
 
-** Page Starts: Start Listening to Emacs WebSocket Server.
+** DONE Page Starts: Start Listening to Emacs WebSocket Server.
 
 Show the live state of connection in the webpage.
 
