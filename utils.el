@@ -1,5 +1,7 @@
 ;; This file is meant to be evaluated by emacsclient.
 
+(require 'websocket)
+
 (defun peekable-string-and-properties ()
   "Return the segment of the buffer string that is peekable in the
 current window."
@@ -59,7 +61,7 @@ properties of the current buffer to JSON."
                                     (setf result (concat result ","))))
                       result)))))
 
-(json-parse-string (testing.))
+(json-parse-string (json<-all-peekable))
 
 ;;; Note
 

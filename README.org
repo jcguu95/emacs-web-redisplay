@@ -11,8 +11,8 @@ npm start
 ** Write a function for each of the following steps.
 
 #+begin_quote
-1. [ ] Emacs State -> Peekable (Propertied) Buffer String and Overlays
-2. [ ]             -> Json String
+1. [X] Emacs State -> Peekable (Propertied) Buffer String and Overlays
+2. [X]             -> Json String
 3. [ ]             -> Json String [via WebSocket]
 4. [ ]             -> String, Properties, Overlays (and print out onto the end of the webpage)
 5. [ ]             -> Presentable Characters
@@ -30,3 +30,10 @@ Show the live state of connection in the webpage.
 
 1. Print it on a div in the webpage with timestamp.
 2. Print it in emacs \*Message\* buffer with timestamp.
+
+** Compute what to show in Emacs
+
+Heavy computations should be done in emacs.
+
+In particular, what it should send to the web page is a sequence of
+characters. Each character may have its own property.
