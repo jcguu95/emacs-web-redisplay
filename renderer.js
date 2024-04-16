@@ -1,13 +1,13 @@
 const btn = document.getElementById('btn')
-const windows = document.querySelectorAll('.window');
+// const windows = document.querySelectorAll('.window');
 
-windows[0].classList.add('active');
-windows.forEach((div, index) => {
-    div.addEventListener('click', () => {
-        windows.forEach(d => d.classList.remove('active'));
-        div.classList.add('active');
-    });
-});
+// windows[0].classList.add('active');
+// windows.forEach((div, index) => {
+//     div.addEventListener('click', () => {
+//         windows.forEach(d => d.classList.remove('active'));
+//         div.classList.add('active');
+//     });
+// });
 
 // IPC with emacs via WebSocket
 // FIXME When connection fails, warn about the situation, and try to reconnect.
