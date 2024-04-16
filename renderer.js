@@ -46,20 +46,69 @@ btn.addEventListener('click', async () => {
 
 
 
-document.addEventListener('keydown', function(event) {
-    emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${event.key}`);
+// // Add event listener for keyup event
+// document.addEventListener('keyup', function(event) {
+//     const activeWindow = document.querySelector('.window.active');
+//     let currentText = activeWindow.textContent;
+//     if (event.key === 'Backspace') {
+//         // Remove the last character if backspace is pressed
+//         activeWindow.textContent = currentText.slice(0, -1);
+//     } else {
+//         activeWindow.textContent = currentText + event.key;
+//     }
+// });
+
+
+// Function Keys
+const functionKeysMap = {"Control": false,
+                         "Alt": false,
+                         "Shift": false,
+                         "Meta": false,
+                         "Hyper": false}
+
+function modalEdit(key) {
+    if (functionKeysMap["Hyper"]) { key = "H-" + key}
+    if (functionKeysMap["Meta"]) { key = "s-" + key}
+    if (functionKeysMap["Shift"]) { key = "S-" + key}
+    if (functionKeysMap["Alt"]) { key = "M-" + key}
+    if (functionKeysMap["Control"]) { key = "C-" + key}
+    return key
+}
+
+document.addEventListener("keydown", function(event) {
+    switch (event.key) {
+    case "Control":
+        functionKeysMap["Control"] = true;
+        break;
+    case "Shift":
+        functionKeysMap["Shift"] = true;
+        break;
+    case "Alt":
+        functionKeysMap["Alt"] = true;
+        break;
+    case "Meta":
+        functionKeysMap["Meta"] = true;
+        break;
+    case "Hyper":
+        functionKeysMap["Hyper"] = true;
+        break;
+    default:
+        console.log(functionKeysMap);
+        emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${modalEdit(event.key)}`);
+    }
 });
 
-
-
-// Add event listener for keyup event
-document.addEventListener('keyup', function(event) {
-    const activeWindow = document.querySelector('.window.active');
-    let currentText = activeWindow.textContent;
-    if (event.key === 'Backspace') {
-        // Remove the last character if backspace is pressed
-        activeWindow.textContent = currentText.slice(0, -1);
-    } else {
-        activeWindow.textContent = currentText + event.key;
+document.addEventListener("keyup", function(event) {
+    switch (event.key) {
+    case "Control":
+        functionKeysMap["Control"] = false;
+    case "Shift":
+        functionKeysMap["Shift"] = false;
+    case "Alt":
+        functionKeysMap["Alt"] = false;
+    case "Meta":
+        functionKeysMap["Meta"] = false;
+    case "Hyper":
+        functionKeysMap["Hyper"] = false;
     }
 });
