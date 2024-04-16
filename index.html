@@ -7,19 +7,25 @@
     <!-- TODO Find out what the below are about, and all potential risks. -->
     <!-- NOTE If without this, the webpage bans itself from connecting websockets? -->
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' ws://localhost:3000">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; connect-src 'self' ws://localhost:3000; style-src 'self' 'unsafe-inline'">
+    <!-- NOTE connect-src should be allowing websocket connection, style-src should be allowing inline font change -->
     <!-- TODO Find out what the above are about, and all potential risks. -->
+
 
     <title>Hello World!</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    We are using Node.js
+    <span id="node-version", style="font-family: 'PT Mono'; color: #83c07c; font-size: 25px"></span>,
+    Chromium
+    <span id="chrome-version", style="font-family: 'PT Mono'; color: #83c07c; font-size: 25px"></span>,
+    and Electron
+    <span id="electron-version", style="font-family: 'PT Mono'; color: #fb4934; font-size: 25px"></span>.
 
-    <br><br><button type="button" id="btn">Click!</button><br>
+    <br><br><button type="button" id="btn">Click!</button><br><br>
 
     <pre id="emacs-connection-status">Disconnected</pre>
 
@@ -29,14 +35,14 @@
       </pre>
     </div>
 
-    <div class="frame">
-      <div class="window">
-        Initial Text
-      </div>
-      <div class="window">
-        Initial Text
-      </div>
-    </div>
+    <!-- <div class="frame"> -->
+    <!--   <div class="window"> -->
+    <!--     Initial Text -->
+    <!--   </div> -->
+    <!--   <div class="window"> -->
+    <!--     Initial Text -->
+    <!--   </div> -->
+    <!-- </div> -->
 
     <script src="renderer.js"></script>
 
