@@ -59,6 +59,13 @@ btn.addEventListener('click', async () => {
 // });
 
 
+// TODO Fix the problem with
+//
+// document.addEventListener('keydown', (event) => {
+//     console.log(event)
+//     console.log(event.keyCode)
+// });
+
 // Function Keys
 const functionKeysMap = {"Control": false,
                          "Alt": false,
