@@ -44,8 +44,6 @@ btn.addEventListener('click', async () => {
 })
 
 
-
-
 // // Add event listener for keyup event
 // document.addEventListener('keyup', function(event) {
 //     const activeWindow = document.querySelector('.window.active');
@@ -58,64 +56,25 @@ btn.addEventListener('click', async () => {
 //     }
 // });
 
-
-// TODO Fix the problem with
-//
-// document.addEventListener('keydown', (event) => {
-//     console.log(event)
-//     console.log(event.keyCode)
-// });
-
-// Function Keys
-const functionKeysMap = {"Control": false,
-                         "Alt": false,
-                         "Shift": false,
-                         "Meta": false,
-                         "Hyper": false}
-
-function modalEdit(key) {
-    if (functionKeysMap["Hyper"]) { key = "H-" + key}
-    if (functionKeysMap["Meta"]) { key = "s-" + key}
-    if (functionKeysMap["Shift"]) { key = "S-" + key}
-    if (functionKeysMap["Alt"]) { key = "M-" + key}
-    if (functionKeysMap["Control"]) { key = "C-" + key}
-    return key
+function event2keyname (event) {
+    var realKey = ""
+    if (event.code.match("^Key")) {
+        realKey = event.code.substring(3).toLowerCase()
+    } else {
+        realKey = event.code
+    }
+    if (event.ctrlKey) {realKey = "C-" + realKey}
+    if (event.metaKey) {realKey = "s-" + realKey}
+    if (event.shiftKey) {realKey = "S-" + realKey}
+    if (event.altKey) {realKey = "M-" + realKey}
+    return realKey
 }
 
 document.addEventListener("keydown", function(event) {
-    switch (event.key) {
-    case "Control":
-        functionKeysMap["Control"] = true;
-        break;
-    case "Shift":
-        functionKeysMap["Shift"] = true;
-        break;
-    case "Alt":
-        functionKeysMap["Alt"] = true;
-        break;
-    case "Meta":
-        functionKeysMap["Meta"] = true;
-        break;
-    case "Hyper":
-        functionKeysMap["Hyper"] = true;
-        break;
-    default:
-        console.log(functionKeysMap);
-        emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${modalEdit(event.key)}`);
+    if (["Alt", "Shift", "Control", "Meta"].includes(event.key)) {
+        return;
     }
+    emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${event2keyname(event)}`);
 });
 
-document.addEventListener("keyup", function(event) {
-    switch (event.key) {
-    case "Control":
-        functionKeysMap["Control"] = false;
-    case "Shift":
-        functionKeysMap["Shift"] = false;
-    case "Alt":
-        functionKeysMap["Alt"] = false;
-    case "Meta":
-        functionKeysMap["Meta"] = false;
-    case "Hyper":
-        functionKeysMap["Hyper"] = false;
-    }
-});
+
