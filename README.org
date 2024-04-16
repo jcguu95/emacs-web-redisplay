@@ -15,24 +15,13 @@ Heavy computations should be done in emacs.
 In particular, what it should send to the web page is a sequence of
 characters. Each character may have its own property.
 
-** Write a function for each of the following steps.
-
-#+begin_quote
-1. [X] Emacs State -> Peekable (Propertied) Buffer String and Overlays
-2. [X]             -> Json String
-3. [X]             -> Json String [via WebSocket]
-4. [ ]             -> Presentable Characters
-5. [ ]             -> Document Operations
-6. [ ]             -> Effects
-#+end_quote
-
 ** DONE Page Starts: Start Listening to Emacs WebSocket Server.
 
 Show the live state of connection in the webpage.
 
 ** DONE Refresh State Upon Button Clicks
 
-** Key-up Effects
+** DONE Key-up Effects
 
 1. Print it on a div in the webpage with timestamp.
 2. Print it in emacs \*Message\* buffer with timestamp.

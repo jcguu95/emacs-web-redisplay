@@ -24,7 +24,8 @@
        (lambda (_websocket frame)
          (push (list 'message frame) *debug-queue*)
          (message (format "\n[Connection %s]:" *current-connection-id*))
-         (message (format-time-string "[%Y-%m-%d %H:%M:%S] Received message through websocket."))
+         (message (format-time-string "[%Y-%m-%d %H:%M:%S] Received message through websocket:"))
+         (message (format "> text: %s" (websocket-frame-text frame)))                ;
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
          (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties))))
 

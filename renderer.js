@@ -20,7 +20,7 @@ emacs_ws.onmessage = function(event) {
 
 
 
-
+// Checks Connection with Emacs //
 async function checkEmacsConnectionLoop() {
   while (true) {
     await new Promise(resolve => setTimeout(resolve, 1000)); // sleep for 1 second
@@ -42,6 +42,15 @@ btn.addEventListener('click', async () => {
     emacs_ws.send("JavaScript: Hello!");
     // emacs_ws.close();
 })
+
+
+
+
+document.addEventListener('keydown', function(event) {
+    emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${event.key}`);
+});
+
+
 
 // Add event listener for keyup event
 document.addEventListener('keyup', function(event) {
