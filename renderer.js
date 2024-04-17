@@ -13,13 +13,21 @@ const btn = document.getElementById('btn')
 // FIXME When connection fails, warn about the situation, and try to reconnect.
 emacs_ws = new WebSocket("ws://localhost:3000");
 emacs_ws.onmessage = function(event) {
-  document.getElementsByClassName("emacs-window")[0].textContent = ""
-  text = JSON.parse(event.data).text
-  text.forEach(function(character) {
+  document.getElementsByClassName("emacs-window")[0].textContent = "";
+  data = JSON.parse(event.data);
+  text = data["text"];
+  pt = data["effective-point"]; counter = 1; // for drawing cursor
+  text.forEach ( function(character) {
     var newSpan = document.createElement("span");
     newSpan.textContent = character["c"]
     newSpan.style.color = character["fg"]
+    // draws cursor
+    if (counter == pt) {
+      newSpan.style.color = "black";
+      newSpan.style.backgroundColor = "white";
+    }
     document.getElementsByClassName("emacs-window")[0].appendChild(newSpan);
+    counter += 1;
   });
 
 }
