@@ -1,5 +1,10 @@
 ;;; -*- lexical-binding: t; -*-
 
+(cl-defun effective-point (&optional (window (car (window-list))))
+  (let ((from (window-start window))
+        result)
+    (- (point) from -1)))
+
 (cl-defun %%peekable-string-and-text-properties (&optional (window (car (window-list))))
   (let* ((buffer (window-buffer window))
          (from (window-start window))
@@ -9,11 +14,10 @@
     (setf string (substring string 0 (min (- to from) (length string))))
     (with-current-buffer buffer
       (let* ((plain-text (substring-no-properties string))
-             (text-properties (object-intervals string))
-             (effective-point (- (point) from -1)))
+             (text-properties (object-intervals string)))
         (list :plain-text plain-text
               :text-properties text-properties
-              :effective-point effective-point)))))
+              :effective-point (effective-point window))))))
 
 (cl-defun %%peekable-overlay-properties (&optional (window (car (window-list))))
   (let* ((buffer (window-buffer window))
@@ -44,23 +48,30 @@
 (defun specified? (x)
   (not (eq 'unspecified x)))
 
+(defun get-face-attr (face attr frame)
+  (cond ((null face) 'unspecified)
+        ((symbolp face)
+         (face-attribute face attr frame t))
+        ((listp face)
+         (or (cl-getf face attr) 'unspecified))))
+
 (defun wrap! (character properties)
   (let ((result (make-hash-table))
         (props (ht<-plist properties))
         (frame (selected-frame)))
-    (setf (gethash :char result) character)
+    (setf (gethash :c result) character)
     (maphash (lambda (key val)
                (when (eq key 'face)
                  (let ((face val))
-                   (let ((foreground (face-attribute face :foreground frame t))
-                         (background (face-attribute face :background frame t))
-                         (weight     (face-attribute face :weight     frame t)))
+                   (let ((foreground (get-face-attr face :foreground frame))
+                         (background (get-face-attr face :background frame))
+                         (weight     (get-face-attr face :weight     frame)))
                      (when (specified? foreground)
-                       (setf (gethash :foreground result) foreground))
+                       (setf (gethash :fg result) foreground))
                      (when (specified? background)
-                       (setf (gethash :background result) background))
+                       (setf (gethash :bg result) background))
                      (when (specified? weight)
-                       (setf (gethash :weight result) weight)))))
+                       (setf (gethash :wt result) weight)))))
                ;; TODO Implement for fontified and other properties.
                ;; (when (eq key 'fontified)
                ;;   "TODO")
@@ -86,6 +97,11 @@
                 (cl-getf result :text))
        ;; TODO Implement for overlays too.
        ))
+    (setf (cl-getf result :text) (reverse (cl-getf result :text)))
     result))
 
-(json-encode-list (process-data (%%peekable-data)))
+;; Main Usage
+;; (json-encode-list (process-data (%%peekable-data)))
+
+;; The following should not err.
+;; (json-parse-string (json-encode-list (process-data (%%peekable-data))))

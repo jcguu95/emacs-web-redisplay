@@ -31,7 +31,9 @@
            ;; FIXME Handle conditions carefully here.
            (setq unread-command-events (listify-key-sequence (kbd key))))
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
-         (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties))))
+         (websocket-send-text *opened-websocket* (json-encode-list (process-data (%%peekable-data))))
+         ;; (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties)))
+         )
 
        :on-close
        (lambda (_websocket)

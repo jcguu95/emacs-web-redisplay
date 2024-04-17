@@ -13,8 +13,15 @@ const btn = document.getElementById('btn')
 // FIXME When connection fails, warn about the situation, and try to reconnect.
 emacs_ws = new WebSocket("ws://localhost:3000");
 emacs_ws.onmessage = function(event) {
-  console.log(event);
-  document.getElementsByClassName("emacs-window")[0].textContent = JSON.parse(event.data)[0]
+  document.getElementsByClassName("emacs-window")[0].textContent = ""
+  text = JSON.parse(event.data).text
+  text.forEach(function(character) {
+    var newSpan = document.createElement("span");
+    newSpan.textContent = character["c"]
+    newSpan.style.color = character["fg"]
+    document.getElementsByClassName("emacs-window")[0].appendChild(newSpan);
+  });
+
 }
 
 
