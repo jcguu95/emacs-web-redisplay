@@ -28,15 +28,16 @@
          ;; (message (format "> text: %s" (websocket-frame-text frame)))                ;
          (let ((key (websocket-frame-text frame)))
            (message (format "%S" key))
+           ;; FIXME Handle conditions carefully here.
            (setq unread-command-events (listify-key-sequence (kbd key))))
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
          (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties))))
 
 
-       (progn
-         (setq unread-command-events (listify-key-sequence (kbd "DEL")))
-         (sleep-for 0.5)
-         (setq unread-command-events (listify-key-sequence (kbd "j"))))
+       ;; (progn
+       ;;   (setq unread-command-events (listify-key-sequence (kbd "DEL")))
+       ;;   (sleep-for 0.5)
+       ;;   (setq unread-command-events (listify-key-sequence (kbd "j"))))
 
 
        :on-close
