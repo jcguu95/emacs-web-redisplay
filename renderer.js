@@ -37,11 +37,11 @@ checkEmacsConnectionLoop();
 
 
 
-btn.addEventListener('click', async () => {
-    console.log("OUCH!")
-    emacs_ws.send("JavaScript: Hello!");
-    // emacs_ws.close();
-})
+// btn.addEventListener('click', async () => {
+//     console.log("OUCH!")
+//     emacs_ws.send("JavaScript: Hello!");
+//     // emacs_ws.close();
+// })
 
 
 // // Add event listener for keyup event
@@ -57,24 +57,52 @@ btn.addEventListener('click', async () => {
 // });
 
 function event2keyname (event) {
-    var realKey = ""
-    if (event.code.match("^Key")) {
-        realKey = event.code.substring(3).toLowerCase()
-    } else {
-        realKey = event.code
-    }
-    if (event.ctrlKey) {realKey = "C-" + realKey}
-    if (event.metaKey) {realKey = "s-" + realKey}
-    if (event.shiftKey) {realKey = "S-" + realKey}
-    if (event.altKey) {realKey = "M-" + realKey}
-    return realKey
+  console.log(event)
+  var realKey = ""
+
+  if (event.shiftKey) {
+    realKey = event.key
+  } else {
+    realKey = event.code
+  }
+
+  if (realKey.match("^Key")) {
+    realKey = realKey.substring(3).toLowerCase()
+  } else if (realKey.match("^F")) {
+    // <f1> ~ <f12>
+    realKey = "<f" + realKey.substring(1) + ">"
+  } else if (realKey.match("^Digit")) {
+    // Digits
+    realKey = realKey.substring(5)
+  } else if (realKey.match("Escape")) {
+    realKey = "ESC"
+  } else if (realKey.match("Enter")) {
+    realKey = "RET"
+  } else if (realKey.match("Space")) {
+    realKey = "SPC"
+  } else if (realKey.match("Backspace")) {
+    realKey = "DEL"
+  } else {
+    realKey = realKey
+  }
+
+  // Decoration with function keys
+  if (event.ctrlKey) {realKey = "C-" + realKey} ;
+  if (event.metaKey) {realKey = "s-" + realKey} ;
+  // if (event.shiftKey) {realKey = "S-" + realKey} ;
+  if (event.altKey) {realKey = "M-" + realKey} ;
+
+  // Debug
+  console.log(realKey) ;
+
+  return realKey ;
 }
 
 document.addEventListener("keydown", function(event) {
     if (["Alt", "Shift", "Control", "Meta"].includes(event.key)) {
         return;
     }
-    emacs_ws.send(`[${new Date(Date.now()).toISOString()}] JS: ${event2keyname(event)}`);
+    emacs_ws.send(`${event2keyname(event)}`);
 });
 
 

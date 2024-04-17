@@ -23,11 +23,21 @@
        :on-message
        (lambda (_websocket frame)
          (push (list 'message frame) *debug-queue*)
-         (message (format "\n[Connection %s]:" *current-connection-id*))
-         (message (format-time-string "[%Y-%m-%d %H:%M:%S] Received message through websocket:"))
-         (message (format "> text: %s" (websocket-frame-text frame)))                ;
+         ;; (message (format "\n[Connection %s]:" *current-connection-id*))
+         ;; (message (format-time-string "[%Y-%m-%d %H:%M:%S] Received message through websocket:"))
+         ;; (message (format "> text: %s" (websocket-frame-text frame)))                ;
+         (let ((key (websocket-frame-text frame)))
+           (message (format "%S" key))
+           (setq unread-command-events (listify-key-sequence (kbd key))))
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
          (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties))))
+
+
+       (progn
+         (setq unread-command-events (listify-key-sequence (kbd "DEL")))
+         (sleep-for 0.5)
+         (setq unread-command-events (listify-key-sequence (kbd "j"))))
+
 
        :on-close
        (lambda (_websocket)
