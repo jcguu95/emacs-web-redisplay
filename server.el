@@ -33,13 +33,6 @@
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
          (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties))))
 
-
-       ;; (progn
-       ;;   (setq unread-command-events (listify-key-sequence (kbd "DEL")))
-       ;;   (sleep-for 0.5)
-       ;;   (setq unread-command-events (listify-key-sequence (kbd "j"))))
-
-
        :on-close
        (lambda (_websocket)
          (websocket-send-text *opened-websocket* "Goodbye.")
