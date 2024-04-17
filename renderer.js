@@ -24,9 +24,6 @@ emacs_ws.onmessage = function(event) {
 
 }
 
-
-
-
 // Checks Connection with Emacs //
 async function checkEmacsConnectionLoop() {
   while (true) {
@@ -40,9 +37,6 @@ async function checkEmacsConnectionLoop() {
   }
 }
 checkEmacsConnectionLoop();
-
-
-
 
 // btn.addEventListener('click', async () => {
 //     console.log("OUCH!")
@@ -81,10 +75,15 @@ function event2keyname (event) {
   } else if (realKey.match("^Digit")) {
     // Digits
     realKey = realKey.substring(5)
+  } else if (realKey.match("^Arrow")) {
+    // Arrows
+    realKey = "<" + realKey.substring(5).toLowerCase() + ">"
   } else if (realKey.match("Escape")) {
     realKey = "ESC"
   } else if (realKey.match("Enter")) {
     realKey = "RET"
+  } else if (realKey.match("Slash")) {
+    realKey = "/"
   } else if (realKey.match("Space")) {
     realKey = "SPC"
   } else if (realKey.match("Backspace")) {
@@ -96,12 +95,10 @@ function event2keyname (event) {
   // Decoration with function keys
   if (event.ctrlKey) {realKey = "C-" + realKey} ;
   if (event.metaKey) {realKey = "s-" + realKey} ;
-  // if (event.shiftKey) {realKey = "S-" + realKey} ;
-  if (event.altKey) {realKey = "M-" + realKey} ;
+  if (event.altKey)  {realKey = "M-" + realKey} ;
 
   // Debug
-  console.log(realKey) ;
-
+  // console.log(realKey) ;
   return realKey ;
 }
 
