@@ -41,6 +41,9 @@
 (defun index-in-prop? (index prop)
   (<= (nth 0 prop) index (1- (nth 1 prop))))
 
+(defun specified? (x)
+  (not (eq 'unspecified x)))
+
 (defun wrap! (character properties)
   (let ((result (make-hash-table))
         (props (ht<-plist properties))
@@ -49,12 +52,15 @@
     (maphash (lambda (key val)
                (when (eq key 'face)
                  (let ((face val))
-                   (setf (gethash :foreground result)
-                         (face-attribute face :foreground frame t))
-                   (setf (gethash :background result)
-                         (face-attribute face :background frame t))
-                   (setf (gethash :weight result)
-                         (face-attribute face :weight     frame t))))
+                   (let ((foreground (face-attribute face :foreground frame t))
+                         (background (face-attribute face :background frame t))
+                         (weight     (face-attribute face :weight     frame t)))
+                     (when (specified? foreground)
+                       (setf (gethash :foreground result) foreground))
+                     (when (specified? background)
+                       (setf (gethash :background result) background))
+                     (when (specified? weight)
+                       (setf (gethash :weight result) weight)))))
                ;; TODO Implement for fontified and other properties.
                ;; (when (eq key 'fontified)
                ;;   "TODO")
@@ -73,14 +79,13 @@
           (current-character))
       (cl-loop
        for index from 0 to (1- (length plain-text))
-       do (setf current-character (aref plain-text index))
+       do (setf current-character (substring plain-text index (1+ index)))
        do (unless (index-in-prop? index current-text-prop)
             (setf current-text-prop (pop text-properties)))
        do (push (wrap! current-character (nth 2 current-text-prop))
-                result)
+                (cl-getf result :text))
        ;; TODO Implement for overlays too.
        ))
     result))
 
-;; FIXME Characters are now numbers. Fix this.
 (json-encode-list (process-data (%%peekable-data)))
