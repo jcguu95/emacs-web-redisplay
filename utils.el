@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+;;; THE WHOLE FILE MAY BE DEPRECATED SOON by UTILS2.EL.
+
 ;;; Interval Properties Update
 
 (cl-defun %push-interval-properties
