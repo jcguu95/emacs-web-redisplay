@@ -16,20 +16,23 @@ emacs_ws.onmessage = function(event) {
   document.getElementsByClassName("emacs-window")[0].textContent = "";
   data = JSON.parse(event.data);
   text = data["text"];
-  pt = data["effective-point"]; counter = 1; // for drawing cursor
+  pt = data["effective-point"];
+  counter = 1; // for drawing cursor
   text.forEach ( function(character) {
     var newSpan = document.createElement("span");
-    newSpan.textContent = character["c"]
+    newSpan.textContent = character["t"] // "t" stands for 'text'
     newSpan.style.color = character["fg"]
-    // draws cursor
+    // newSpan.style.fontSize = character["fs"] // TODO
+    // newSpan.style.fontFamily = character["ff"] // TODO
+
+    counter += character["t"].length; // NOTE character is no longer length 1, it should be called substring
+    // Draws cursor
     if (counter == pt) {
       newSpan.style.color = "black";
       newSpan.style.backgroundColor = "white";
     }
     document.getElementsByClassName("emacs-window")[0].appendChild(newSpan);
-    counter += 1;
   });
-
 }
 
 // Checks Connection with Emacs //
