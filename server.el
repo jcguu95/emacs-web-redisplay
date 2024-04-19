@@ -41,10 +41,14 @@
 
        :on-close
        (lambda (_websocket)
-         (websocket-send-text *opened-websocket* "Goodbye.")
+         (condition-case err
+             (websocket-send-text *opened-websocket* "Goodbye.")
+           (websocket-closed
+            (message "Socket closed already. Message dropped.")))
          (message (format "\n[Connection %s]:" *current-connection-id*))
          (setf *current-connection-id* nil)
          (message (format-time-string "[%Y-%m-%d %H:%M:%S] Websocket closed."))
          (setq *opened-websocket* nil))))
+
 
 ;;;
