@@ -16,21 +16,40 @@ emacs_ws.onmessage = function(event) {
   document.getElementsByClassName("emacs-window")[0].textContent = "";
   data = JSON.parse(event.data);
   text = data["text"];
-  pt = data["effective-point"];
+  effectivePoint = data["effective-point"];
   counter = 1; // for drawing cursor
+
+  // FIXME character is no longer length 1, it should be called substring
   text.forEach ( function(character) {
     var newSpan = document.createElement("span");
-    newSpan.textContent = character["t"] // "t" stands for 'text'
+    text = character["t"] // "t" stands for 'text'
+    length = text.length
     newSpan.style.color = character["fg"]
     // newSpan.style.fontSize = character["fs"] // TODO
     // newSpan.style.fontFamily = character["ff"] // TODO
 
-    counter += character["t"].length; // NOTE character is no longer length 1, it should be called substring
-    // Draws cursor
-    if (counter == pt) {
-      newSpan.style.color = "black";
-      newSpan.style.backgroundColor = "white";
+    // Draw cursor
+    if (counter <= effectivePoint && effectivePoint < counter + length) {
+      cursorSpan = document.createElement("span");
+      cursorSpan.textContent = text[effectivePoint-counter];
+      if (cursorSpan.textContent === '\n') {
+        cursorSpan.textContent = ' \n'; // Adding a space for the cursor to properly show.
+      }
+      cursorSpan.style.color = "black";
+      cursorSpan.style.backgroundColor = "white";
+      cursorSpan.id = 'cursor';
+      //
+      displacement = effectivePoint - counter;
+
+      newSpan.appendChild(document.createTextNode(text.substring(0, displacement)));
+      newSpan.appendChild(cursorSpan);
+      newSpan.appendChild(document.createTextNode(text.substring(1+ displacement)));
+    } else {
+      newSpan.appendChild(document.createTextNode(text));
     }
+    counter += length;
+
+    // Draw span
     document.getElementsByClassName("emacs-window")[0].appendChild(newSpan);
   });
 }
