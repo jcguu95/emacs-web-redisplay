@@ -12,6 +12,16 @@
 ;; following.
 (websocket-server-close my-websocket-server)
 
+;; ;; FIXME Dangerous code. It assumes window-state-change-hook contains no important data.
+;; (defvar *tmp* pre-redisplay-functions)
+;; (push (lambda (window)
+;;         (when (websocket-openp *opened-websocket*)
+;;           (websocket-send-text
+;;            *opened-websocket*
+;;            (json-encode-list (process-data (%%peekable-data window))))))
+;;       pre-redisplay-functions)
+;; (setf pre-redisplay-functions *tmp*)
+
 ;; TODO If connection can't be opened, try closing the previous ones and do it
 ;; again. If it still gets wrong, a serios error should be signaled.
 (setq my-websocket-server
