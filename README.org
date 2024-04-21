@@ -1,12 +1,11 @@
 * Usage
 
+Evaluate =utils2.el= and =server.el= in your emacs, and run
 #+begin_src shell
 npm start
 #+end_src
 
 * TODOs
-
-** DONE Remove Electron IPC and use [[https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API][WebSockets API]].
 
 ** Compute what to show in Emacs
 
@@ -15,14 +14,5 @@ Heavy computations should be done in emacs.
 In particular, what it should send to the web page is a sequence of
 characters. Each character may have its own property.
 
-** DONE Page Starts: Start Listening to Emacs WebSocket Server.
-
-Show the live state of connection in the webpage.
-
-** DONE Refresh State Upon Button Clicks
-
-** DONE Key-up Effects
-
-1. Print it on a div in the webpage with timestamp.
-2. Print it in emacs \*Message\* buffer with timestamp.
+It is currently waaay too slow. TODO: Try =after-change-functions=.
 
