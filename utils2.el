@@ -34,7 +34,9 @@
       (mapcar (lambda (overlay)
                 (list (overlay-start overlay)
                       (overlay-end overlay)
-                      (filter-overlay-properties (overlay-properties overlay))))
+                      (overlay-properties overlay)
+                      ;; (filter-overlay-properties (overlay-properties overlay))
+                      ))
               overlays))))
 
 (cl-defun %%peekable-data (&optional (window (car (window-list))))

@@ -5,22 +5,34 @@
 (defvar *debug-queue* nil)
 (defvar *opened-websocket* nil)
 (defvar *current-connection-id* nil)
+(defvar my-websocket-server nil)
 
 ;; NOTE When the connection is closed from the remote, we do not have to close
 ;; and reopen here. The server should keep listening to the next client
 ;; connection request. In case you want to quit listening, evaluate the
 ;; following.
-(websocket-server-close my-websocket-server)
+(ignore-errors (websocket-server-close my-websocket-server))
 
-;; ;; FIXME Dangerous code. It assumes window-state-change-hook contains no important data.
+(defun websocket-redisplay! ()
+  "NOTE It is too slow."
+  (websocket-send-text
+   *opened-websocket*
+   (json-encode-list (process-data (%%peekable-data)))))
+
+;; FIXME Experimental and may slow down emacs indefinitely. 
 ;; (defvar *tmp* pre-redisplay-functions)
 ;; (push (lambda (window)
 ;;         (when (websocket-openp *opened-websocket*)
-;;           (websocket-send-text
-;;            *opened-websocket*
-;;            (json-encode-list (process-data (%%peekable-data window))))))
+;;           (websocket-redisplay!)))
 ;;       pre-redisplay-functions)
 ;; (setf pre-redisplay-functions *tmp*)
+
+;; FIXME Experimental and may slow down emacs indefinitely. 
+;; This code takes care of redisplay whenever buffer text is changed.
+(defvar *tmp2* after-change-functions)
+(push (lambda (_ __ ___) (websocket-redisplay!))
+      after-change-functions)
+;; (setf after-change-functions *tmp2*)
 
 ;; TODO If connection can't be opened, try closing the previous ones and do it
 ;; again. If it still gets wrong, a serios error should be signaled.
@@ -45,7 +57,7 @@
            ;; FIXME Handle conditions carefully here.
            (setq unread-command-events (listify-key-sequence (kbd key))))
          ;; (websocket-send-text *opened-websocket* "Hello from emacs!")
-         (websocket-send-text *opened-websocket* (json-encode-list (process-data (%%peekable-data))))
+         (websocket-redisplay!)
          ;; (websocket-send-text *opened-websocket* (json-encode-list (window-string-with-all-properties)))
          )
 
@@ -59,6 +71,5 @@
          (setf *current-connection-id* nil)
          (message (format-time-string "[%Y-%m-%d %H:%M:%S] Websocket closed."))
          (setq *opened-websocket* nil))))
-
 
 ;;;

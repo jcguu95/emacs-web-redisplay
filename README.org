@@ -5,14 +5,7 @@ Evaluate =utils2.el= and =server.el= in your emacs, and run
 npm start
 #+end_src
 
-* TODOs
+* TODO
 
-** Compute what to show in Emacs
-
-Heavy computations should be done in emacs.
-
-In particular, what it should send to the web page is a sequence of
-characters. Each character may have its own property.
-
-It is currently waaay too slow. TODO: Try =after-change-functions=.
-
+The redisplay function is very slow. This is the main bottle neck of the
+project.
