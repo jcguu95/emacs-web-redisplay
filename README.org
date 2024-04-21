@@ -9,3 +9,8 @@ npm start
 
 The redisplay function is very slow. This is the main bottle neck of the
 project.
+
+=after-change-functions= actually enables a finer control to what is changed.
+Try that. In that works, whenever emacs received a key, it doesn't have to
+redraw all the text IF (1) text wasn't changed AND IF (2) peekable beg/end
+didn't change.
