@@ -14,3 +14,9 @@ project.
 Try that. In that works, whenever emacs received a key, it doesn't have to
 redraw all the text IF (1) text wasn't changed AND IF (2) peekable beg/end
 didn't change.
+
+* NOTE [2025-12-06 Sat]
+
+I just realized that emacs must have calculated some minimal data before
+calculating them into pixels. I should find them and use them for candidates
+to pipe to the browser.
