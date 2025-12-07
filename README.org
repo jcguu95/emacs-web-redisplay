@@ -5,7 +5,109 @@ Evaluate =utils2.el= and =server.el= in your emacs, and run
 npm start
 #+end_src
 
-* TODO
+* NOTE [2025-12-07 Sun] Emacs Display Migration Plan (EmacsInternal->VDOM)
+
+** Step 1: Data Capture and Serialization in the C Core
+
+The goal is to intercept the highest-level semantic data before it is
+committed to a pixel-ready format.
+
+*** 1.1 Capture Point in =xdisp.c=
+
+The capture point must be inside the main loop of display_window
+
+*** 1.2 Data Extraction and Structure
+
+The data must be extracted from the =struct it=, which contains the high-level
+semantic element before any geometry is calculated.
+
+*** Remark
+
+Why struct glyph is NOT the candidate: A struct glyph is a post-layout
+data structure in Emacs. It includes pixel_width, voffset, and is already
+optimized for the current frame's font metrics. Using it would defeat the
+purpose of being platform-agnostic, as the data would be tied to Emacs's
+internal width calculations, forcing the browser to mimic that exact layout
+rather than using its own superior CSS engine. We must capture the raw content
+and styling intent.
+
+** Step 2: Data Transmission to JavaScript VDOM
+
+The C core must serialize the VDT and send it across the C-JS boundary.
+
+*** 2.1 Array Data Structure: The Virtual Display Tree (VDT)
+
+The data sent is a tree of Virtual Display Elements. The JavaScript VDOM does
+not need to understand the semantics of the Emacs display model (Frame →
+Window → Line → Element); it merely sees a standard nested data structure.
+
++ Tree Structure (VDT): The C core outputs a structured array representing:
+  Frame -> Window -> Display Line -> Display Element.
++ Key Fields: Each element in the VDT must include:
+  + type: (text, image, widget, etc.)
+  + content: (The Unicode string or Image URL/ID)
+  + face: (The Emacs face ID, mapped to a CSS class)
+  + key: (A unique, stable identifier for VDOM tracking, especially at the Line level).
+
+*** Remark
+
+Why Computation of Diff Should Be Done in JS VDOM, Not in C: The differential
+computation (diffing) should be delegated to the JavaScript VDOM framework
+(e.g., React, Vue).
+
++ Single Source of Truth: The JS VDOM layer is the single source of truth for
+  the live rendered state (the last successful DOM output).
+
++ Avoid State Sync Overhead: Requiring the C core to maintain a synchronized
+  copy of the previous rendered state is complex, memory-intensive, and prone
+  to error if the DOM changes outside of Emacs's control (e.g., browser
+  extensions).
+
++ Leverage Optimized Algorithms: VDOM libraries already contain highly
+  optimized, battle-tested algorithms for tree comparison and batching DOM
+  updates, which are typically more performant and reliable than
+  re-implementing them in C.
+
+** Step 3: Platform Agnosticism and Shortcomings
+
+*** 3.1 Platform Agnosticism
+
+This architecture is highly platform agnostic because the C core outputs only
+semantic data (what to display), not geometric data (where and how wide to
+display it).
+
++ The C Core becomes a Logic Server, independent of any rendering target.
+
++ The JS Bridge acts as a Renderer Adapter, capable of mapping the VDT to any
+  JS-accessible environment:
+
+  + Browser: → HTML DOM / CSS
+
+  + Desktop (Electron/Tauri): → Embedded Chromium Engine
+
+  + Mobile (React Native Web): → Custom Host Views
+
+The common layer is the VDT, which ensures the core logic remains universal.
+
+*** 3.2 Shortcomings
+
+The trade-off for this universality introduces specific challenges:
+
++ Loss of Native Look and Feel: The UI is rendered using HTML/CSS, which will
+  never perfectly replicate the nuanced look, feel, and performance
+  characteristics of true native widgets (Qt/GTK/SwiftUI).
+
++ Latency Overhead: Although minimal, the data must travel through the C-JS
+  boundary and the VDOM reconciliation step before hitting the browser's
+  native rendering engine.
+  
+* NOTE [2025-12-06 Sat]
+
+I just realized that emacs must have calculated some minimal data before
+calculating them into pixels. I should find them and use them for candidates
+to pipe to the browser.
+
+* TODOs [Deprecated]
 
 The redisplay function is very slow. This is the main bottle neck of the
 project.
@@ -15,8 +117,3 @@ Try that. In that works, whenever emacs received a key, it doesn't have to
 redraw all the text IF (1) text wasn't changed AND IF (2) peekable beg/end
 didn't change.
 
-* NOTE [2025-12-06 Sat]
-
-I just realized that emacs must have calculated some minimal data before
-calculating them into pixels. I should find them and use them for candidates
-to pipe to the browser.
